@@ -20,9 +20,9 @@ Client
 ======
 Clients to test are Python scripts
 
-./upload.py encrypts and Base64 encodes a payload and sends it in a POST request to webservice plurals.
+./upload.py encrypts and Base64 encodes a payload and sends it in a POST request to webservice plurals. This call will be made again after x hours when reply is not successful.
 
-./get_score.py encrypts and Base64 encodes user_id and and sends it with location in a POST request to webservice score.
+./get_score.py encrypts and Base64 encodes user_id and and sends it with location in a POST request to webservice score. This call may be made only once every 24 hours, client will govern this.
 
 Server
 ======
@@ -50,6 +50,17 @@ A thread in C code is running in the same webserver. All it does is:
 * receive user chosen location in parameter called l, when this parameter is present
 * this parameter is in form of string containing ISO 3166-2 code and is stored
 * scores for user are being returned
+Example call is http://hellebaard.nl:8081/blahblah/score?u=sikfr42CDJ8DpSThurbzsw%3D%3D&l=NL-UT and the reply is JSON with score.
+
+{
+    "plural_submits": 100,
+    "plural_position_overall": 20,
+    "plural_position_country": 10,
+    "plural_position_region": 1,
+    "for_location": "NL-UT"
+}
+
+When another location is submitted then is known in database, that location will be used next time when score is retrieved. Information message in client when location is changed that it will take 24 hours later before new score is reported for the new location.
 
 Data model
 ==========
@@ -71,23 +82,23 @@ encoded_encrypted_data
   
 user_id
   BSON_TYPE_STRING
-  e.g. ****
+  e.g. NULL or ****
 
 word_id
   BSON_TYPE_INT64
-  e.g. 41012531
+  e.g. NULL or 41012531
   
 synset_id
   BSON_TYPE_INT64
-  e.g. 0
+  e.g. NULL or 37581
   
 word_type
   BSON_TYPE_INT32
-  e.g. 1
+  e.g. NULL or 1
   
 data
   BSON_TYPE_STRING
-  e.g. smörgåsbord
+  e.g. NULL or smörgåsbord
   
   
 Namespace blahblah.users
@@ -100,24 +111,32 @@ _id (ObjectId)
   BSON_TYPE_OID
   this contains timestamp from moment of insert
 
+encrypted_user_id
+  BSON_TYPE_STRING
+  e.g. sikfr42CDJ8DpSThurbzsw%3D%3D
+  
 user_id
   BSON_TYPE_STRING
-  e.g. ***
+  e.g. NULL or ***
   
 location
   BSON_TYPE_STRING
-  e.g. NL-UT
+  e.g. NULL or NL-UT
   
-submitted_plurals
+plurals_submitted
   BSON_TYPE_INT32
-  e.g. 1
+  e.g. NULL or 100
   
-country_rating
+plurals_position_overall
   BSON_TYPE_INT32
-  e.g. 1
+  e.g. NULL or 20
     
-region_ration
+plurals_position_country
   BSON_TYPE_INT32
-  e.g. 1
+  e.g. NULL or 10
+    
+plurals_position_region
+  BSON_TYPE_INT32
+  e.g. NULL or 1
   
-Database can be viewed by running mongodump. Contents can be viewed by running mongoexport -d blahblah -c plurals. Real-time statistics can be monitored by running mongostats.
+Database can be viewed by running mongodump. Contents can be viewed by running mongoexport -d blahblah -c plurals or ./dump-db.sh. Real-time statistics can be monitored by running mongostats.

@@ -46,7 +46,13 @@ do_inserts (mongo_sync_connection *conn)
 {
 	bson *data1a;
 	data1a = bson_build
-		(BSON_TYPE_STRING,    "encoded_encrypted_data", "SGVsbG8gV29ybGQgCg==", -1,
+		(BSON_TYPE_TIMESTAMP, "processed", NULL,
+		 BSON_TYPE_STRING,    "encoded_encrypted_data", "SGVsbG8gV29ybGQgCg==", -1,
+		 BSON_TYPE_STRING,    "user_id", NULL, -1,
+		 BSON_TYPE_INT64,     "word_id", NULL,
+		 BSON_TYPE_INT64,     "synset_id", NULL,
+		 BSON_TYPE_INT32,     "word_type", NULL,
+		 BSON_TYPE_STRING,    "data", NULL, -1,
 		 BSON_TYPE_NONE);
     // Missing values or NULL values are simply not provided.
 	bson_finish (data1a);
