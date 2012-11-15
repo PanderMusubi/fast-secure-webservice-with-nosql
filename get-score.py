@@ -35,7 +35,7 @@ user_id1 = '****'
 location1 = 'NL-UT'
 
 user_id2 = '++++'
-location2 = 'BE-LI'
+location2 = 'BE-VLI'
 
 print 'data:'
 print 'user_id1', user_id1

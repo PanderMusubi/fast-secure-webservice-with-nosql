@@ -1,4 +1,4 @@
-PROGRAMS = store
+PROGRAMS = store store-user-location
 
 all: ${PROGRAMS}
 clean:

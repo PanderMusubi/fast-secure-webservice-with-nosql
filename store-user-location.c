@@ -13,9 +13,9 @@ delete_old (mongo_sync_connection *conn)
 		 BSON_TYPE_NONE);
 	bson_finish (b);
 
-//TODO How to delete all records?
+	//TODO How to delete all records?
 
-	if (!mongo_sync_cmd_delete(conn, "blahblah.plurals", 0, b)) {
+	if (!mongo_sync_cmd_delete(conn, "blahblah.score", 0, b)) {
 		fprintf (stderr, "Error creating index: %s\n", strerror(errno));
 		exit (1);
 
@@ -25,63 +25,62 @@ delete_old (mongo_sync_connection *conn)
 
 //FIXME Error creating index: Operation not supported
 /*	static void
-create_index (mongo_sync_connection *conn)
-{
+	create_index (mongo_sync_connection *conn)
+	{
 	bson *indexes;
 
 	indexes = bson_build (BSON_TYPE_STRING,    "encoded_encrypted_data", "", -1,
-			BSON_TYPE_NONE);
+	BSON_TYPE_NONE);
 	bson_finish (indexes);
 
-	if (!mongo_sync_cmd_index_create(conn, "blahblah.plurals", indexes, MONGO_INDEX_UNIQUE | MONGO_INDEX_DROP_DUPS | MONGO_INDEX_BACKGROUND | MONGO_INDEX_SPARSE)) {
-		fprintf (stderr, "Error creating index: %s\n", strerror(errno));
-		exit (1);
+	if (!mongo_sync_cmd_index_create(conn, "blahblah.score", indexes, MONGO_INDEX_UNIQUE | MONGO_INDEX_DROP_DUPS | MONGO_INDEX_BACKGROUND | MONGO_INDEX_SPARSE)) {
+	fprintf (stderr, "Error creating index: %s\n", strerror(errno));
+	exit (1);
 
-		bson_free (indexes);
+	bson_free (indexes);
 	}
-}*/
+	}*/
 
 	static void
 do_inserts (mongo_sync_connection *conn)
 {
-	bson *data1a;
-	data1a = bson_build
-		(BSON_TYPE_TIMESTAMP, "processed", 0,
-		 BSON_TYPE_STRING,    "encoded_encrypted_data", "SGVsbG8gV29ybGQgCg==", -1,
-		 BSON_TYPE_STRING,    "user_id", "", -1,
-		 BSON_TYPE_INT64,     "word_id", 0,
-		 BSON_TYPE_INT64,     "synset_id", 0,
-		 BSON_TYPE_INT32,     "word_type", 0,
-		 BSON_TYPE_STRING,    "data", "", -1,
+	bson *user1;
+	user1 = bson_build
+		(BSON_TYPE_STRING, "encrypted_user_id", "sikfr42CDJ8DpSThurbzsw%3D%3D", -1,
+		 BSON_TYPE_STRING, "user_id", "", -1,
+		 BSON_TYPE_STRING, "location", "", -1,
+		 BSON_TYPE_INT32, "plurals_submitted", 0,
+		 BSON_TYPE_INT32, "plurals_position_overall", 0,
+		 BSON_TYPE_INT32, "plurals_position_country", 0,
+		 BSON_TYPE_INT32, "plurals_position_region", 0,
 		 BSON_TYPE_NONE);
-    // Missing values or NULL values are simply not provided.
-	bson_finish (data1a);
+	bson_finish (user1);
 
-	if (!mongo_sync_cmd_insert (conn, "blahblah.plurals", data1a, NULL))
+	if (!mongo_sync_cmd_insert (conn, "blahblah.score", user1, NULL))
 	{
-		fprintf (stderr, "Error inserting document: %s\n", strerror(errno));
+		fprintf (stderr, "Error inserting document 1: %s\n", strerror(errno));
 		exit (1);
 	}
-	bson_free (data1a);
+	bson_free (user1);
 
-	bson *data1b;
-	data1b = bson_build
-		(BSON_TYPE_TIMESTAMP, "processed", 1294860709000,
-		 BSON_TYPE_STRING,    "encoded_encrypted_data", "SGVsbG8gV29ybGQgCg==", -1,
-		 BSON_TYPE_STRING,    "user_id", "****", -1,
-		 BSON_TYPE_INT64,     "word_id", 41012531,
-		 BSON_TYPE_INT64,     "synset_id", 0,
-		 BSON_TYPE_INT32,     "word_type", 1,
-		 BSON_TYPE_STRING,    "data", "smörgåsbord", -1,
+	bson *user2;
+	user2 = bson_build
+		(BSON_TYPE_STRING, "encrypted_user_id", "UUFSOhFPVNOMlZxF29DKTw==", -1,
+		 BSON_TYPE_STRING, "user_id", "****", -1,
+		 BSON_TYPE_STRING, "location", "BE-VLI", -1,
+		 BSON_TYPE_INT32, "plurals_submitted", 100,
+		 BSON_TYPE_INT32, "plurals_position_overall", 20,
+		 BSON_TYPE_INT32, "plurals_position_country", 10,
+		 BSON_TYPE_INT32, "plurals_position_region", 1,
 		 BSON_TYPE_NONE);
-	bson_finish (data1b);
+	bson_finish (user2);
 
-	if (!mongo_sync_cmd_insert (conn, "blahblah.plurals", data1b, NULL))
+	if (!mongo_sync_cmd_insert (conn, "blahblah.score", user2, NULL))
 	{
-		fprintf (stderr, "Error inserting document: %s\n", strerror(errno));
+		fprintf (stderr, "Error inserting document 2: %s\n", strerror(errno));
 		exit (1);
 	}
-	bson_free (data1b);
+	bson_free (user2);
 }
 
 	static void
@@ -92,12 +91,12 @@ do_query (mongo_sync_connection *conn)
 	gchar *error = NULL;
 
 	query = bson_build
-		(BSON_TYPE_TIMESTAMP, "processed", 1294860709000,
+		(BSON_TYPE_STRING, "user_id", "****", -1,
 		 BSON_TYPE_NONE);
 	bson_finish (query);
 
-	c = mongo_sync_cursor_new (conn, "blahblah.plurals",
-			mongo_sync_cmd_query (conn, "blahblah.plurals", 0,
+	c = mongo_sync_cursor_new (conn, "blahblah.score",
+			mongo_sync_cmd_query (conn, "blahblah.score", 0,
 				0, 10, query, NULL));
 	if (!c)
 	{
@@ -118,7 +117,7 @@ do_query (mongo_sync_connection *conn)
 		{
 			int e = errno;
 
-			mongo_sync_cmd_get_last_error (conn, "blahblah.plurals", &error);
+			mongo_sync_cmd_get_last_error (conn, "blahblah.score", &error);
 			fprintf (stderr, "Error retrieving cursor data: %s\n",
 					(error) ? error : strerror (e));
 			exit (1);
@@ -154,7 +153,7 @@ main (void)
 
 	delete_old (conn);
 	do_inserts (conn);
-//	create_index (conn);
+	//	create_index (conn);
 	do_query (conn);
 
 	mongo_sync_disconnect (conn);

@@ -117,7 +117,7 @@ encrypted_user_id
   
 user_id
   BSON_TYPE_STRING
-  e.g. NULL or ***
+  e.g. NULL or ****
   
 location
   BSON_TYPE_STRING
