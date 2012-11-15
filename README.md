@@ -18,7 +18,11 @@ sudo make (install in /usr/local)
 
 Client
 ======
-Client to test is Python script ./upload.py which encrypts and Base64 encodes a payload and sends it in a POST request to a webservice.
+Clients to test are Python scripts
+
+./upload.py encrypts and Base64 encodes a payload and sends it in a POST request to webservice plurals.
+
+./get_score.py encrypts and Base64 encodes user_id and and sends it with location in a POST request to webservice score.
 
 Server
 ======
@@ -30,7 +34,7 @@ A thread in C code is running in TODO webserver. All it does is:
 * process only POSTs with parameter called d with a value
 * that value of d is URL-decoded and stored in field encrypted_encoded in MongoDB database blahblah.plurals
 * the value is unique in the database, duplicates are ignored
-Example call is http://hellebaard.nl:8081/blahblah/plurals?d=.%3Ey%1B%15%FEz%AD%CAr%B3%AC%CD%B6%BB%F7p%94%03%B4%CB%22Ly%C7%1EQ%AA%03%D6%0FL
+Example call is http://hellebaard.nl:8081/blahblah/plurals?d=Lj55GxX%2Beq3KcrOszba793CUA7TLIkx5xx5RqgPWD0w%3D
 
 Part 2: Decoding, decrypting and calculating score
 
