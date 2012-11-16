@@ -9,37 +9,71 @@ delete_old (mongo_sync_connection *conn)
 {
 	bson *b;
 	b = bson_build
-		(BSON_TYPE_TIMESTAMP, "processed", 1294860709000,
+		(BSON_TYPE_STRING, "encrypted_user_id", "UUFSOhFPVNOMlZxF29DKTw==", -1,
 		 BSON_TYPE_NONE);
 	bson_finish (b);
 
 	//TODO How to delete all records?
 
 	if (!mongo_sync_cmd_delete(conn, "blahblah.score", 0, b)) {
-		fprintf (stderr, "Error creating index: %s\n", strerror(errno));
+		fprintf (stderr, "Error deleting: %s\n", strerror(errno));
 		exit (1);
 
 		bson_free (b);
 	}
+
+	bson *b2;
+	b2 = bson_build
+		(BSON_TYPE_STRING, "encrypted_user_id", "sikfr42CDJ8DpSThurbzsw%3D%3D", -1,
+		 BSON_TYPE_NONE);
+	bson_finish (b2);
+
+	//TODO How to delete all records?
+
+	if (!mongo_sync_cmd_delete(conn, "blahblah.score", 0, b2)) {
+		fprintf (stderr, "Error deleting: %s\n", strerror(errno));
+		exit (1);
+
+		bson_free (b2);
+	}
+
+}
+
+	static void
+drop_and_create (mongo_sync_connection *conn)
+{
+	if (mongo_sync_cmd_exists(conn, "blahblah", "score")) {
+//	    printf("collection exists and is being dropped\n");
+    	if (!mongo_sync_cmd_drop(conn, "blahblah", "score")) {
+        	fprintf (stderr, "Error dropping collection: %s\n", strerror(errno));
+        	exit(1);
+    	}
+	}
+	if (!mongo_sync_cmd_exists(conn, "blahblah", "score")) {
+//	    printf("collection does not exist and is being created\n");
+    	if (!mongo_sync_cmd_create(conn, "blahblah", "score", MONGO_COLLECTION_DEFAULTS)) {
+        	fprintf (stderr, "Error creating collection: %s\n", strerror(errno));
+        	exit(1);
+        }
+	}
 }
 
 //FIXME Error creating index: Operation not supported
-/*	static void
-	create_index (mongo_sync_connection *conn)
-	{
+	static void
+create_index (mongo_sync_connection *conn)
+{
 	bson *indexes;
 
-	indexes = bson_build (BSON_TYPE_STRING,    "encoded_encrypted_data", "", -1,
+	indexes = bson_build (BSON_TYPE_INT64, "encrypted_user_id", 1,
 	BSON_TYPE_NONE);
 	bson_finish (indexes);
 
 	if (!mongo_sync_cmd_index_create(conn, "blahblah.score", indexes, MONGO_INDEX_UNIQUE | MONGO_INDEX_DROP_DUPS | MONGO_INDEX_BACKGROUND | MONGO_INDEX_SPARSE)) {
-	fprintf (stderr, "Error creating index: %s\n", strerror(errno));
-	exit (1);
-
+    	fprintf (stderr, "Error creating index: %s\n", strerror(errno));
+       	exit (1);
+    }
 	bson_free (indexes);
-	}
-	}*/
+}
 
 	static void
 do_inserts (mongo_sync_connection *conn)
@@ -55,7 +89,6 @@ do_inserts (mongo_sync_connection *conn)
 		 BSON_TYPE_INT32, "plurals_position_region", 0,
 		 BSON_TYPE_NONE);
 	bson_finish (user1);
-
 	if (!mongo_sync_cmd_insert (conn, "blahblah.score", user1, NULL))
 	{
 		fprintf (stderr, "Error inserting document 1: %s\n", strerror(errno));
@@ -74,13 +107,30 @@ do_inserts (mongo_sync_connection *conn)
 		 BSON_TYPE_INT32, "plurals_position_region", 1,
 		 BSON_TYPE_NONE);
 	bson_finish (user2);
-
 	if (!mongo_sync_cmd_insert (conn, "blahblah.score", user2, NULL))
 	{
 		fprintf (stderr, "Error inserting document 2: %s\n", strerror(errno));
 		exit (1);
 	}
 	bson_free (user2);
+
+	bson *user3;
+	user3 = bson_build
+		(BSON_TYPE_STRING, "encrypted_user_id", "UUFSOhFPVNOMlZxF29DKTw==", -1,
+		 BSON_TYPE_STRING, "user_id", "****", -1,
+		 BSON_TYPE_STRING, "location", "BE-VLI", -1,
+		 BSON_TYPE_INT32, "plurals_submitted", 100,
+		 BSON_TYPE_INT32, "plurals_position_overall", 20,
+		 BSON_TYPE_INT32, "plurals_position_country", 10,
+		 BSON_TYPE_INT32, "plurals_position_region", 1,
+		 BSON_TYPE_NONE);
+	bson_finish (user2);
+	if (!mongo_sync_cmd_insert (conn, "blahblah.score", user3, NULL))
+	{
+		fprintf (stderr, "Error inserting document 2: %s\n", strerror(errno));
+		exit (1);
+	}
+	bson_free (user3);
 }
 
 	static void
@@ -110,8 +160,7 @@ do_query (mongo_sync_connection *conn)
 	{
 		bson *b = mongo_sync_cursor_get_data (c);
 		bson_cursor *bc;
-		gint32 w_t;
-		gint64 w_i;
+		const gchar *loc;
 
 		if (!b)
 		{
@@ -123,13 +172,9 @@ do_query (mongo_sync_connection *conn)
 			exit (1);
 		}
 
-		bc = bson_find (b, "word_type");
-		bson_cursor_get_int32 (bc, &w_t);
-		printf ("\rWord type: %d\n", w_t);
-
-		bc = bson_find (b, "word_id");
-		bson_cursor_get_int64 (bc, &w_i);
-		printf ("\rWord id: %d\n", (int)w_i);
+		bc = bson_find (b, "location");
+		bson_cursor_get_string (bc, &loc);
+		printf ("\rLocation: %s\n", loc);
 
 		bson_cursor_free (bc);
 		bson_free (b);
@@ -152,8 +197,9 @@ main (void)
 	}
 
 	delete_old (conn);
+    drop_and_create(conn);
+	create_index (conn);
 	do_inserts (conn);
-	//	create_index (conn);
 	do_query (conn);
 
 	mongo_sync_disconnect (conn);
