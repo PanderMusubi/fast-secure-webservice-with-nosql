@@ -43,18 +43,18 @@ delete_old (mongo_sync_connection *conn)
 drop_and_create (mongo_sync_connection *conn)
 {
 	if (mongo_sync_cmd_exists(conn, "blahblah", "score")) {
-//	    printf("collection exists and is being dropped\n");
-    	if (!mongo_sync_cmd_drop(conn, "blahblah", "score")) {
-        	fprintf (stderr, "Error dropping collection: %s\n", strerror(errno));
-        	exit(1);
-    	}
+		//	    printf("collection exists and is being dropped\n");
+		if (!mongo_sync_cmd_drop(conn, "blahblah", "score")) {
+			fprintf (stderr, "Error dropping collection: %s\n", strerror(errno));
+			exit(1);
+		}
 	}
 	if (!mongo_sync_cmd_exists(conn, "blahblah", "score")) {
-//	    printf("collection does not exist and is being created\n");
-    	if (!mongo_sync_cmd_create(conn, "blahblah", "score", MONGO_COLLECTION_DEFAULTS)) {
-        	fprintf (stderr, "Error creating collection: %s\n", strerror(errno));
-        	exit(1);
-        }
+		//	    printf("collection does not exist and is being created\n");
+		if (!mongo_sync_cmd_create(conn, "blahblah", "score", MONGO_COLLECTION_DEFAULTS)) {
+			fprintf (stderr, "Error creating collection: %s\n", strerror(errno));
+			exit(1);
+		}
 	}
 }
 
@@ -65,13 +65,13 @@ create_index (mongo_sync_connection *conn)
 	bson *indexes;
 
 	indexes = bson_build (BSON_TYPE_INT64, "encrypted_user_id", 1,
-	BSON_TYPE_NONE);
+			BSON_TYPE_NONE);
 	bson_finish (indexes);
 
 	if (!mongo_sync_cmd_index_create(conn, "blahblah.score", indexes, MONGO_INDEX_UNIQUE | MONGO_INDEX_DROP_DUPS | MONGO_INDEX_BACKGROUND | MONGO_INDEX_SPARSE)) {
-    	fprintf (stderr, "Error creating index: %s\n", strerror(errno));
-       	exit (1);
-    }
+		fprintf (stderr, "Error creating index: %s\n", strerror(errno));
+		exit (1);
+	}
 	bson_free (indexes);
 }
 
@@ -195,9 +195,14 @@ main (void)
 		fprintf (stderr, "Connection failed: %s\n", strerror (errno));
 		return 1;
 	}
+	if (!mongo_sync_conn_set_auto_reconnect (conn, TRUE))
+	{
+		fprintf (stderr, "Enabling reconnect failed: %s\n", strerror (errno));
+		return 1;
+	}
 
 	delete_old (conn);
-    drop_and_create(conn);
+	drop_and_create(conn);
 	create_index (conn);
 	do_inserts (conn);
 	do_query (conn);

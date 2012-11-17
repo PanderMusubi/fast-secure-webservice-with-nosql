@@ -1,4 +1,4 @@
-PROGRAMS = store store-user-location
+PROGRAMS = store store-user-location drop-and-create-collections insert-tests-into-collections
 
 all: ${PROGRAMS}
 clean:
