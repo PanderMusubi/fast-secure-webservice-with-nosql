@@ -26,30 +26,75 @@ open test-form.html in firefox and watch command line for 3rd and 4th test
 void
 receive_plurals(evhtp_request_t * req, void * a) {
     if (req->method != htp_method_POST) { 
+        evhtp_send_reply(req, EVHTP_RES_BADREQ);
         return;
     }
     
+    int max_len = 1024;
     int len = evbuffer_get_length(req->buffer_in);
-    if (len == 0) {
+    if (len == 0 || len >= max_len) {
+        evhtp_send_reply(req, EVHTP_RES_BADREQ);
+        return;
+    }
+    char buf[max_len];
+    evbuffer_remove(req->buffer_in, buf, len);
+    buf[len] = '\0';
+
+    if (buf[0] != 'd' || buf[1] != '=' || strstr(buf + 2, "=") != NULL || strstr(buf, "&") != NULL) {
+        evhtp_send_reply(req, EVHTP_RES_BADREQ);
         return;
     }
 
-
-    char buf[1024];
-    int n;
-    while ((n = evbuffer_remove(req->buffer_in, buf, sizeof(buf))) > 0) {
-        fwrite(buf, 1, n, stdout);
-    }
-    printf("\n");
+    printf("d: %s\n", buf + 2);
 
     evhtp_send_reply(req, EVHTP_RES_OK);
 }
 
 void
 provide_score(evhtp_request_t * req, void * a) {
-    const char * str = a;
+    if (req->method != htp_method_POST) { 
+        evhtp_send_reply(req, EVHTP_RES_BADREQ);
+        return;
+    }
+    
+    int max_len = 1024;
+    int len = evbuffer_get_length(req->buffer_in);
+    if (len == 0 || len >= max_len) {
+        evhtp_send_reply(req, EVHTP_RES_BADREQ);
+        return;
+    }
+    char buf[max_len];
+    evbuffer_remove(req->buffer_in, buf, len);
+    buf[len] = '\0';
 
-    evbuffer_add_printf(req->buffer_out, "%s", str);
+    char* amp_pos = strchr(buf, '&');
+    if (amp_pos == NULL || amp_pos != strrchr(buf, '&')) {
+        evhtp_send_reply(req, EVHTP_RES_BADREQ);
+        return;
+    }
+
+    buf[amp_pos - buf] = '\0';
+    if (buf[0] == 'u') {
+        if (buf[1] != '=' || strstr(buf + 2, "=") != NULL || strstr(buf, "&") != NULL || amp_pos[2] != '=' || strstr(amp_pos + 3, "=") != NULL || amp_pos[1] != 'd') {
+            evhtp_send_reply(req, EVHTP_RES_BADREQ);
+            return;
+        }
+        printf("u: %s\n", buf + 2);
+        printf("d: %s\n", amp_pos + 3);
+    } else {
+        if (buf[0] == 'd') {
+           if (buf[1] != '=' || strstr(buf + 2, "=") != NULL || strstr(buf, "&") != NULL || amp_pos[2] != '=' || strstr(amp_pos + 3, "=") != NULL || amp_pos[1] != 'u') {
+                evhtp_send_reply(req, EVHTP_RES_BADREQ);
+                return;
+            }
+            printf("u: %s\n", amp_pos + 3);
+            printf("d: %s\n", buf + 2);
+        } else {
+            evhtp_send_reply(req, EVHTP_RES_BADREQ);
+            return;
+        }
+    }
+
     evhtp_send_reply(req, EVHTP_RES_OK);
 }
 
