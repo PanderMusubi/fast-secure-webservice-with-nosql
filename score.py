@@ -23,7 +23,7 @@ def encode(data):
 def decode(data):# only for testing
     return base64.b64decode(data)
 
-def get_score(user_id, data, host, path, headers, conn):
+def score(user_id, data, host, path, headers, conn):
     try:
         params = urllib.urlencode({'u': user_id, 'd': data})
         print 'http://' + host + path + '?' + params
@@ -82,7 +82,7 @@ path = '/blahblah/score'
 host = 'hellebaard.nl:8081'
 conn = httplib.HTTPConnection(host)
 
-get_score(eeuser_id1, eedata1, host, path, headers, conn)
-get_score(eeuser_id2, eedata2, host, path, headers, conn)
+score(eeuser_id1, eedata1, host, path, headers, conn)
+score(eeuser_id2, eedata2, host, path, headers, conn)
 
 conn.close()
