@@ -1,1 +1,4 @@
-store store-user-location
+store
+store-user-location
+drop-and-create-collections
+insert-tests-into-collections
