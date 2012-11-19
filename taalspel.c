@@ -1,3 +1,20 @@
+/*Build inside of https://github.com/ellzey/libevhtp
+by adding these lines
+
+add_executable(taalspel taalspel.c)
+target_link_libraries(taalspel libevhtp ${LIBEVHTP_EXTERNAL_LIBS} ${SYS_LIBS})
+
+to CMakeLists.txt and doing
+
+cd build
+cmake ..
+make
+make test
+./taalspel
+
+open test-form.html in firefox and watch command line for 3rd and 4th test
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
