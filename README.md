@@ -5,24 +5,24 @@ Fast and secure webservice written in C with MongoDB NoSQL database
 
 Prerequisites
 =============
-sudo apt-get install mongodb-clients mongodb-server colorgcc gcc
-sudo ln -sf /usr/bin/colorgcc /etc/alternatives/cc
-cd /tmp
-wget https://github.com/algernon/libmongo-client/archive/master.zip
-unzip master.zip
-cd libmongo-client-master
-autoreconf -i
-./configure
-make
-sudo make (install in /usr/local)
+    sudo apt-get install mongodb-clients mongodb-server colorgcc gcc
+    sudo ln -sf /usr/bin/colorgcc /etc/alternatives/cc
+    cd /tmp
+    wget https://github.com/algernon/libmongo-client/archive/master.zip
+    unzip master.zip
+    cd libmongo-client-master
+    autoreconf -i
+    ./configure
+    make
+    sudo make (install in /usr/local)
 
 Client
 ======
 Clients to test are Python scripts
 
-./upload.py encrypts and Base64 encodes a payload and sends it in a POST request to webservice plurals. This call will be made again after x hours when reply is not successful.
+    ./upload.py encrypts and Base64 encodes a payload and sends it in a POST request to webservice plurals. This call will be made again after x hours when reply is not successful.
 
-./get_score.py encrypts and Base64 encodes user_id and and sends it with location in a POST request to webservice score. This call may be made only once every 24 hours, client will govern this.
+    ./get_score.py encrypts and Base64 encodes user_id and and sends it with location in a POST request to webservice score. This call may be made only once every 24 hours, client will govern this.
 
 Server
 ======
@@ -52,13 +52,13 @@ A thread in C code is running in the same webserver. All it does is:
 * scores for user are being returned
 Example call is http://hellebaard.nl:8081/blahblah/score?u=sikfr42CDJ8DpSThurbzsw%3D%3D&l=NL-UT and the reply is JSON with score.
 
-{
-    "plural_submits": 100,
-    "plural_position_overall": 20,
-    "plural_position_country": 10,
-    "plural_position_region": 1,
-    "for_location": "NL-UT"
-}
+    {
+        "plural_submits": 100,
+        "plural_position_overall": 20,
+        "plural_position_country": 10,
+        "plural_position_region": 1,
+        "for_location": "NL-UT"
+    }
 
 When another location is submitted then is known in database, that location will be used next time when score is retrieved. Information message in client when location is changed that it will take 24 hours later before new score is reported for the new location.
 
@@ -68,75 +68,77 @@ MongoDB database has by default a unique ObjectID or _id from which also the ins
 
 Namespace blahblah.plurals
 
-"Field name"
-  "Mongo BSON type in C"
-  "Notes or examples"
+    "Field name"
+      "Mongo BSON type in C"
+      "Notes or examples"
 
-_id (ObjectId)
-  BSON_TYPE_OID
-  this contains timestamp from moment of insert
+    _id (ObjectId)
+      BSON_TYPE_OID
+      this contains timestamp from moment of insert
 
-encoded_encrypted_data
-  BSON_TYPE_STRING
-  e.g. Lj55GxX+eq3KcrOszba793CUA7TLIkx5xx5RqgPWD0w=
+    encoded_encrypted_data
+      BSON_TYPE_STRING
+      e.g. Lj55GxX+eq3KcrOszba793CUA7TLIkx5xx5RqgPWD0w=
   
-user_id
-  BSON_TYPE_STRING
-  e.g. NULL or ****
+    user_id
+      BSON_TYPE_STRING
+      e.g. NULL or ****
 
-word_id
-  BSON_TYPE_INT64
-  e.g. NULL or 41012531
+    word_id
+      BSON_TYPE_INT64
+      e.g. NULL or 41012531
   
-synset_id
-  BSON_TYPE_INT64
-  e.g. NULL or 37581
+    synset_id
+      BSON_TYPE_INT64
+      e.g. NULL or 37581
   
-word_type
-  BSON_TYPE_INT32
-  e.g. NULL or 1
+    word_type
+      BSON_TYPE_INT32
+      e.g. NULL or 1
   
-data
-  BSON_TYPE_STRING
-  e.g. NULL or smörgåsbord
+    data
+      BSON_TYPE_STRING
+      e.g. NULL or smörgåsbord
   
   
 Namespace blahblah.users
 
-"Field name"
-  "Mongo BSON type in C"
-  "Notes or examples"
+    "Field name"
+      "Mongo BSON type in C"
+      "Notes or examples"
 
-_id (ObjectId)
-  BSON_TYPE_OID
-  this contains timestamp from moment of insert
+    _id (ObjectId)
+      BSON_TYPE_OID
+      this contains timestamp from moment of insert
 
-encrypted_user_id
-  BSON_TYPE_STRING
-  e.g. sikfr42CDJ8DpSThurbzsw%3D%3D
+    encrypted_user_id
+      BSON_TYPE_STRING
+      e.g. sikfr42CDJ8DpSThurbzsw%3D%3D
   
-user_id
-  BSON_TYPE_STRING
-  e.g. NULL or ****
+    user_id
+      BSON_TYPE_STRING
+      e.g. NULL or ****
   
-location
-  BSON_TYPE_STRING
-  e.g. NULL or NL-UT
+    location
+      BSON_TYPE_STRING
+      e.g. NULL or NL-UT
   
-plurals_submitted
-  BSON_TYPE_INT32
-  e.g. NULL or 100
+    plurals_submitted
+      BSON_TYPE_INT32
+      e.g. NULL or 100
   
-plurals_position_overall
-  BSON_TYPE_INT32
-  e.g. NULL or 20
+    plurals_position_overall
+      BSON_TYPE_INT32
+      e.g. NULL or 20
     
-plurals_position_country
-  BSON_TYPE_INT32
-  e.g. NULL or 10
+    plurals_position_country
+      BSON_TYPE_INT32
+      e.g. NULL or 10
     
-plurals_position_region
-  BSON_TYPE_INT32
-  e.g. NULL or 1
+    plurals_position_region
+      BSON_TYPE_INT32
+      e.g. NULL or 1
   
-Database can be viewed by running mongodump. Contents can be viewed by running mongoexport -d blahblah -c plurals or ./dump-db.sh. Real-time statistics can be monitored by running mongostats.
+Database can be viewed by running mongodump. Contents can be viewed by running
+    mongoexport -d blahblah -c plurals or ./dump-db.sh.
+Real-time statistics can be monitored by running mongostats.
