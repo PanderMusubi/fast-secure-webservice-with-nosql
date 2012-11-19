@@ -23,7 +23,7 @@ def encode(data):
 def decode(data):# only for testing
     return base64.b64decode(data)
 
-def upload(data, host, path, headers, conn):
+def plurals(data, host, path, headers, conn):
     try:
         params = urllib.urlencode({'d': data})
         print 'http://' + host + path + '?' + params
@@ -32,7 +32,7 @@ def upload(data, host, path, headers, conn):
         print response.status, response.reason
         data = response.read()
     except:
-        print 'Unable to upload'
+        print 'Unable to upload plurals'
 
 # type 1 (is singular with plural(s))
 data1a = serialize(
@@ -188,17 +188,17 @@ path = '/blahblah/plurals'
 host = 'hellebaard.nl:8081'
 conn = httplib.HTTPConnection(host)
 
-upload(eedata1a, host, path, headers, conn)
-upload(eedata1b, host, path, headers, conn)
-upload(eedata2a, host, path, headers, conn)
-upload(eedata2b, host, path, headers, conn)
-upload(eedata3a, host, path, headers, conn)
-upload(eedata3b, host, path, headers, conn)
-upload(eedata4a, host, path, headers, conn)
-upload(eedata4b, host, path, headers, conn)
-upload(eedata5a, host, path, headers, conn)
-upload(eedata5b, host, path, headers, conn)
-upload(eedata6a, host, path, headers, conn)
-upload(eedata6b, host, path, headers, conn)
+plurals(eedata1a, host, path, headers, conn)
+plurals(eedata1b, host, path, headers, conn)
+plurals(eedata2a, host, path, headers, conn)
+plurals(eedata2b, host, path, headers, conn)
+plurals(eedata3a, host, path, headers, conn)
+plurals(eedata3b, host, path, headers, conn)
+plurals(eedata4a, host, path, headers, conn)
+plurals(eedata4b, host, path, headers, conn)
+plurals(eedata5a, host, path, headers, conn)
+plurals(eedata5b, host, path, headers, conn)
+plurals(eedata6a, host, path, headers, conn)
+plurals(eedata6b, host, path, headers, conn)
 
 conn.close()

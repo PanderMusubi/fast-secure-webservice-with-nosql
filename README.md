@@ -20,7 +20,7 @@ Client
 ======
 Clients to test are Python scripts
 
-    ./upload.py encrypts and Base64 encodes a payload and sends it in a POST request to webservice plurals. This call will be made again after x hours when reply is not successful.
+    ./plurals.py encrypts and Base64 encodes a payload and sends it in a POST request to webservice plurals. This call will be made again after x hours when reply is not successful.
 
     ./score.py encrypts and Base64 encodes user_id and and sends it with location in a POST request to webservice score. This call may be made only once every 24 hours, client will govern this.
 

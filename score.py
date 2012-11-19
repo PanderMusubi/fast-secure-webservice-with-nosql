@@ -32,7 +32,7 @@ def score(user_id, data, host, path, headers, conn):
         print response.status, response.reason
         data = response.read()
     except:
-        print 'Unable to upload'
+        print 'Unable to download score'
 
 user_id1 = '****'
 data1 = serialize(
